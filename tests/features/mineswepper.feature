@@ -28,11 +28,11 @@ Scenario: Pressing reset button
 When the user presses the reset <button> button
 Then all squares should be covered
 And the mine counter should be determinated by the dificulty
-And the timer should be the null
+And the timer should be null
 
 Scenario Outline: Pressing the right click on the square
 Given the square is covered
-When when the user clicks the right button more than once up to a maximum of 3 <times>
+When the user clicks the right button <times>
 Then in the square should show the following value: <distintiveIcon>
 And the <mine counter> should decrease by one with every marked square 
 
@@ -41,6 +41,7 @@ Examples:
 |   1     |      !           |      
 |   2     |      ?           |
 |   3     |                  |
+
 Scenario: Start the timer
 Given all the squares are covered 
 And the timer is set at null
@@ -84,10 +85,16 @@ And has a adjacent <mine>
 Then in the vacant square should show the <number> of adjacents mines
 
 Examples:
+
 |   mines   |   number  |
 |   1       |   1       |
+|   2       |   2       |
 |   3       |   3       |
-
+|   4       |   4       |
+|   5       |   5       |
+|   6       |   6       |
+|   7       |   7       |
+|   8       |   8       |
 
 
 
