@@ -1,100 +1,110 @@
 Feature: Mineswepper
 
+"1, 2" means row 1 column 2
+x stands for cell with a bomb
+o stands for an empty cell
+- stands for another row
+
 Background:
 Given a user opens the app
 
-Scenario Outline: Choose a dificulty
-When the user choose a <dificulty>
-Then the <mine counter> should increse
-And the <map width> should increse
-And the <map height> should increse
-
-Examples:
-|   dificulty   | mine counter |    map width   | map height |
-|   easy        |   10         |    8           |   8        |
-| intermediate  |   40         |    16          |   16       |
-|   expert      |   99         |    30          |   16       |
 
 Scenario: Default display of the app
-Then the display shoud show all the squares covered
-And the mine counter should be determinated by the dificulty
-
-Scenario: Pressing one square
-Given the square is covered
-When the user presses the square
-Then the square should be uncovered
-
-Scenario: Pressing reset button
-When the user presses the reset <button> button
-Then all squares should be covered
-And the mine counter should be determinated by the dificulty
+Then the display shoud show a table with height "8" and width "8"
+And all the square should be covered
 And the timer should be null
+And the mine counter should be at "10" 
 
-Scenario Outline: Pressing the right click on the square
-Given the square is covered
-When the user clicks the right button <times>
-Then in the square should show the following value: <distintiveIcon>
-And the <mine counter> should decrease by one with every marked square 
+Scenario: Uncover a square: -> Uncover a square without a mine
+Given the following mockdata is loaded: "oox-xox"
+When the user uncover the square "1,1"
+Then the square should be uncovered
+And the game should countinue
 
-Examples:
-| times   | distintiveIcon   |  
-|   1     |      !           |      
-|   2     |      ?           |
-|   3     |                  |
-
-Scenario: Start the timer
-Given all the squares are covered 
-And the timer is set at null
-When the user presses one square
-Then the timer should start to increse
-
-Scenario: Win the game
-Given no mine has exploded
-When the user has uncovered all the vacant squares
-Then the remaining covered squares should uncovered
-And the timer should stop
-And only the reset <button> should be enabled 
-
-Scenario: Lose the game 
-Given one or more vacant squares remaining
-When the user has exploded a mine
-Then the remaining covered squares should remain uncovered
-And the timer should stop
-And only the reset <button> should be enabled 
-
-Scenario: Reach the maximum time allowed
-Given the timer is running
-When time is set to the following value: "999"
-Then the timer should be set to: "∞"
-
-Scenario: Pressing a mine
-Given the user has click in a uncovered square
-When the uncovered square is a mine
+Scenario: Uncover a square: -> Uncover a square with a mine
+Given the following mockdata is loaded: "oox-xox"
+When the user uncover the square "1,3"
 Then the game is over
 And all the squares containing mines should be revaled
 
-Scenario: Pressing a vacant square
-Given the user has click in a uncovered square
-When the uncovered square is vacant
-Then all squares that do not have an adjacent mine are revealed
+Scenario: Tagging a square: -> Tagging a sqaure with an exclamation mark
+Given mine counter is "10"
+When the user taggs the square "1,1"
+Then in the square "1,1" should appear an exclamation mark
+And the mine counter should decrase by one for every marked square
 
-Scenario Outline: Pressing a square with an adjacent mine
-Given the user has click in a uncovered square
-When the uncovered square is vacant
-And has a adjacent <mine>
-Then in the vacant square should show the <number> of adjacents mines
+Scenario: Tagging a square: -> Tagging a square with an interrogation mark
+Given mine counter is "9"
+When the user taggs the square "1,1"
+Then in the square "1,1" should appear an interrogation mark
+And the mine counter should increases by one for every marked square
+
+Scenario: Tagging a square: -> Untagging a square
+Given mine counter is "8"
+When the user untags the square "1,1"
+Then the square "1,1" should appear as covered square
+And the mine counter should increases by one
+
+Scenario: Tagging a square: -> Limit on the mine counter
+
+
+Scenario Outline: Uncover a square: -> Uncover an empty square with one or more adjacent mines
+Given the following mockdata is loaded: <mockdata>
+When the user uncover the square "2,3"
+Then in the uncover square should contain the <number> of adjacent mines
 
 Examples:
+|   mockdata          |   number  |
+|   ooo-xoo-ooo       |   1       |
+|   ooo-xox-ooo       |   2       |
+|   oox-xox-ooo       |   3       |
+|   oox-xox-xoo       |   4       |
+|   oxx-xox-xoo       |   5       |
+|   oxx-xox-xxo       |   6       |
+|   xxx-xox-xxo       |   7       |
+|   xxx-xox-xxx       |   8       |
 
-|   mines   |   number  |
-|   1       |   1       |
-|   2       |   2       |
-|   3       |   3       |
-|   4       |   4       |
-|   5       |   5       |
-|   6       |   6       |
-|   7       |   7       |
-|   8       |   8       |
+Scenario: Win the game when no mines are revealed
+Given the following mockdata is loaded: "oox"
+When the user uncover the square "1,1"
+Then the user wins the game
+And the remaining covered squares should uncovered
+
+Scenario: Game is Over
+When a mine has been revealed
+Then all the squares containg a mine should be uncovered
+And the user cant do anything except reset the app
+
+Scenario:Time counter: -> Start the time counter when reveal a square
+Given the time counter is set null
+When the user uncover the square "1,1"
+Then the time counter should start increases by one for every second passed
+
+Scenario:Time counter: -> Start the time counter when tagging a square
+Given the time counter is set null
+When the user taggs the square "1,1"
+Then the time counter should start increases by one for every second passed
+And the mine counter should decrase by one
+
+Scenario: Time counter: -> Reach the maximum time allowed
+Given the time counter is running
+When the time counter has reached the following value "999"
+Then the time counter should be set to "∞" 
+
+Scenario: The user use the reset button to reset the app
+When the user use the reset button
+Then all the square should be covered
+And the mine counter should be set to "10"
+And the time counter should be set to null
+
+Scenario: Uncover a square: -> Uncover an empty square with no mine adjacent
+Given the following mockdata is loaded: "ooo-ooo-oox" 
+When the user uncover the square "1,1"
+Then all squares without mine adjacent should be uncover
+
+
+
+
 
 
 
