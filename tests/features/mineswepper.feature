@@ -26,11 +26,11 @@ Data for the display:
 "8" stands for a cell with 8 mine adjacent
 
 Background:
-Given a user opens the app
+Given a user opens the game
 
 
-Scenario: Default state of the app
-Then the app shoud show a table with height "8" and width "8"
+Scenario: Default state of the game
+Then the game shoud show a table with height "8" and width "8"
 And all the squares should be covered
 And the timer should be empty
 And the non tagged mine counter should be "10"
@@ -47,15 +47,30 @@ Then the square "1,3" should show an explosion simbol
 And the game should be over
 
 Scenario: Tagging a square: -> When a user thinks the square contains a mine then user can tag the square as mined
-Given mine counter is "10" 
+Given non tagged mine counter is "10" 
 When the user taggs as mined the square "1,1" 
 Then in the square "1,1" should appear a mined simbol
 And the non taged mine counter should by "9"
 
 Scenario: Tagging a square: -> When the user dont have enough information about the square can tag it as inconclusive
-Given mine counter is "10"
+Given non tagged mine counter is "10"
 When the user taggs as inconclusive the square "1,1"
 Then in the square "1,1" should appear a inconclusive simbol
+And the non taged mine counter should by "10"
+
+Scenario: Tagging a square: -> Untagging a square tagged as inconclusive
+Given the user tags as inconclusive the square "1,1"
+And the non taged mine counter is "10"
+When the user untags the square "1,1"
+Then the square "1,1" should appear as covered square
+And there is no simbol in the square "1,1"
+And the non tagged mine counter should be "10"
+
+Scenario: Tagging a square: -> When the user tags as mined a square that is already tagged as mined
+Given non tagged mine counter is "10"
+And the square "1,1" is tagged as inconclusive
+When the user tags the square "1,1" as incoclusive again
+Then in the square "1,1" should appear a incoclusive simbol
 And the non taged mine counter should by "10"
 
 Scenario: Tagging a square: -> Untagging a square tagged as mined
@@ -66,13 +81,13 @@ Then the square "1,1" should appear as covered square
 And there is no simbol in the square "1,1"
 And the non tagged mine counter should be "10"
 
-Scenario: Tagging a square: -> Untagging a square tagged as inconclusive
-Given the user tags as inconclusive the square "1,1"
-And the non taged mine counter is "10"
-When the user untags the square "1,1"
-Then the square "1,1" should appear as covered square
-And there is no simbol in the square "1,1"
-And the non tagged mine counter should be "10"
+Scenario: Tagging a square: -> When the user tags as incoclusive a square that is already tagged as inconclusive
+Given non tagged mine counter is "10"
+And the square "1,1" is tagged as mined
+When the user tags the square "1,1" as mined again
+Then in the square "1,1" should appear a mined simbol
+And the non taged mine counter should by "9"
+
 
 Scenario: Tagging a square: -> When the user tags as mined more squares than the non taged mine counter  
 Given the following mockdata is loaded: <mockdata>
@@ -148,9 +163,9 @@ Given the following mockdata is loaded: "oxo-oox-xox"
 When the user uncover the square "1,2"
 Then the time counter shoud stop
 
-Scenario: The user use the reset button to reset the app
+Scenario: The user use the reset button to reset the game
 When the user use the reset button
-Then the app should restore to the default state
+Then the game should restore to the default state
 
 Scenario: Uncover a square: -> When the user uncovers a empty square, the adjacent squares should be uncover
 Given the following mockdata is loaded: "ooo-ooo-ooo" 
@@ -158,23 +173,15 @@ When the user uncover the square "2,2"
 Then the adjacent squares should be uncovered
 And the display of the table should be: "000-000-000"
 
-Scenario: Uncover a square: -> When the square is uncovered by another square and the square is empty then square should uncover the adjacent squares 
+Scenario: Uncover a square: -> When the square is uncovered by another square and that square is empty then it should uncover the adjacent squares 
 Given the following mockdata is loaded: "oox-ooo-ooo"
-And the user uncover the square "1,1"
-And the app should uncover the adjacent squares
-When the app found an empty uncover square
-Then the app should uncovered the adjacent squares 
+And the square "1,1" is uncovered 
+And the adjacents squares to the square "1,1" should be uncovered
+When the game found the empty square "2,1"
+Then the game should uncovered the adjacent squares to the square "2,1"
+And the display of the table should be: "01.-011-000"
 
 
-Scenario: Uncover a square: -> When the square is uncovered by another square and the square is empty then square should uncover the adjacent squares 
-Given the following mockdata is loaded: "oox-ooo-ooo"
-When the user uncover the square "1,1"
-Then 
-
-oox
-ooo
-ooo
-o
 
 
 
