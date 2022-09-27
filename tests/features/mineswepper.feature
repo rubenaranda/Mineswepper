@@ -1,12 +1,21 @@
 Feature: Mineswepper
 
+
+Data for Mockdata:
 "1, 2" means row 1 column 2
-"x" stands for cell with a bomb
-"o" stands for an empty cell
+"x" stands for cell with a mine
+"o" stands for cell without a mine
+"-" stands for another row
+"!" stands for  mined tag
+"?" stands for inconclusive tag
+
+Data for the display:
 "-" stands for another row
 "!" stands for  mined tag
 "?" stands for inconclusive tag
 "." stands for cover square
+"0" stands for an empty square
+"*" stands for an mined square
 "1" stands for a cell with 1 mine adjacent
 "2" stands for a cell with 2 mine adjacent
 "3" stands for a cell with 3 mine adjacent
@@ -120,30 +129,52 @@ Given the time counter is empty
 When the user taggs the square "1,1"
 Then the time counter should start increases by one for every second passed
 
+@manual
 Scenario: Time counter: -> When the user starts the timer uncovering or taging a square and reaches the max time allowed
 Given the following mockdata is loaded: "oxo-oox-xox"
-And the max time allowed is "30"
+And the max time allowed is "10"
 When the user uncovered the square "1,1"
 And the user tagged as inconclusive the square "1,2"
-And the time counter reaches "30"
+And the time counter reaches "10"
 Then the time counter should be "∞" 
+
+Scenario: Time counter: -> When the user wins the game the time counter stops
+Given Given the following mockdata is loaded: "ox"
+When the user uncovered the square "1,1"
+Then the time counter shoud stop
+
+Scenario: Time counter: -> When the user lose the game the time counter stops
+Given the following mockdata is loaded: "oxo-oox-xox"
+When the user uncover the square "1,2"
+Then the time counter shoud stop
 
 Scenario: The user use the reset button to reset the app
 When the user use the reset button
 Then the app should restore to the default state
 
-Scenario: Uncover a square: -> When the user uncovers an empty square and 
-Given the following mockdata is loaded: "ooo-ooo-oox" 
+Scenario: Uncover a square: -> When the user uncovers a empty square, the adjacent squares should be uncover
+Given the following mockdata is loaded: "ooo-ooo-ooo" 
+When the user uncover the square "2,2"
+Then the adjacent squares should be uncovered
+And the display of the table should be: "000-000-000"
+
+Scenario: Uncover a square: -> When the square is uncovered by another square and the square is empty then square should uncover the adjacent squares 
+Given the following mockdata is loaded: "oox-ooo-ooo"
+And the user uncover the square "1,1"
+And the app should uncover the adjacent squares
+When the app found an empty uncover square
+Then the app should uncovered the adjacent squares 
+
+
+Scenario: Uncover a square: -> When the square is uncovered by another square and the square is empty then square should uncover the adjacent squares 
+Given the following mockdata is loaded: "oox-ooo-ooo"
 When the user uncover the square "1,1"
-Then all squares without mine adjacent should be uncover
+Then 
 
-
-
-
-
-
-
-
+oox
+ooo
+ooo
+o
 
 
 
