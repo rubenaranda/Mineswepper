@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "test:e2e": "cucumber-js --require cucumber.conf.js --require tests/steps/**/*.steps.js --format @cucumber/pretty-formatter --format html:tests/reports/cucumber-report.html --parallel 1"
+    "test:e2e": "cucumber-js --require cucumber.conf.js --require tests/steps/**/*.steps.js --format @cucumber/pretty-formatter --format html:tests/report/cucumber-report.html --parallel 4"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^8.5.3",
-    "playwright": "^1.25.2"
+    "@cucumber/cucumber": "^8.5.2",
+    "@cucumber/pretty-formatter": "^1.0.0",
+    "@playwright/test": "^1.25.1",
+    "playwright": "^1.25.1"
   }
 }

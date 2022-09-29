@@ -28,13 +28,13 @@ Data for the display:
 Background:
 Given a user opens the game
 
-
+@manual
 Scenario: Default state of the game
 Then the game shoud show a table with height "8" and width "8"
 And all the squares should be covered
 And the timer should be empty
 And the non tagged mine counter should be "10"
-
+@actual
 Scenario: Uncover a square: -> Uncover a square without a mine
 Given the following mockdata is loaded: "oox-xox"
 When the user un cover the square "1,1"
@@ -168,18 +168,36 @@ When the user use the reset button
 Then the game should restore to the default state
 
 Scenario: Uncover a square: -> When the user uncovers a empty square, the adjacent squares should be uncover
-Given the following mockdata is loaded: "ooo-ooo-ooo" 
+Given the following mockdata is loaded:
+"""
+ooo
+ooo
+ooo
+xxx
+""" 
 When the user uncover the square "2,2"
-Then the adjacent squares should be uncovered
-And the display of the table should be: "000-000-000"
+Then the display of the table should be:
+"""
+000
+000
+232
+...
+"""
 
 Scenario: Uncover a square: -> When the square is uncovered by another square and that square is empty then it should uncover the adjacent squares 
-Given the following mockdata is loaded: "oox-ooo-ooo"
+Given the following mockdata is loaded:
+"""
+oox
+ooo
+ooo
+"""
 And the square "1,1" is uncovered 
-And the adjacents squares to the square "1,1" should be uncovered
-When the game found the empty square "2,1"
-Then the game should uncovered the adjacent squares to the square "2,1"
-And the display of the table should be: "01.-011-000"
+Then the display of the table should be:
+"""
+01.
+011
+000
+"""
 
 
 
