@@ -34,12 +34,12 @@ Then the game shoud show a table with height "8" and width "8"
 And all the squares should be covered
 And the timer should be empty
 And the non tagged mine counter should be "10"
-@actual
+
 Scenario: Uncover a square: -> Uncover a square without a mine
 Given the following mockdata is loaded: "oox-xox"
-When the user un cover the square "1,1"
+When the user uncover the square "1,1"
 Then the square "1,1" should be uncovered
-
+@actual
 Scenario: Uncover a square: -> Uncover a square with a mine
 Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,3"
