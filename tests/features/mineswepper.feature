@@ -39,13 +39,13 @@ Scenario: Uncover a square: -> Uncover a square without a mine
 Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,1"
 Then the square "1,1" should be uncovered
-@actual
+
 Scenario: Uncover a square: -> Uncover a square with a mine
 Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,3"
 Then the square "1,3" should show an explosion simbol
 And the game should be over
-
+@actual
 Scenario: Tagging a square: -> When a user thinks the square contains a mine then user can tag the square as mined
 Given non tagged mine counter is "10" 
 When the user taggs as mined the square "1,1" 
@@ -125,6 +125,7 @@ Given the following mockdata is loaded: "ox"
 When the user uncover the square "1,1"
 Then the user wins
 
+@actual
 Scenario: Game is Over
 Given the following mockdata is loaded: "oxo-oox-xox"
 When the user uncover the square "1,2"

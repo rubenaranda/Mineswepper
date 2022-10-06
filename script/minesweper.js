@@ -18,6 +18,7 @@ function getMockData(mockData) {
 function startGame (getMockData) {
     if (getMockData != null) {
         createMockTable(getMockData)
+        getMinesPosition(mockData)
     } else {
         createTable(9,9)
         getRandomMinesPosition()
@@ -30,7 +31,7 @@ function createMockTable(mockData) {
 
 // Fuction to create the table of the mineswepper
 
-function createTable(heigh,width){  // This function create the default table of the mineswepper 8x8
+function createTable(heigh,width){  
     for (let i = 1; i < heigh; i++){
         var row = createRow(width)
         row.setAttribute("id",i)
@@ -60,16 +61,23 @@ function createSquare(cellDataTest){
 
 function clickingButtons(event) {
     sqExposed(event.target.id)
+    gameOver(event.target);
 }
 
 function sqExposed(id) {
-document.getElementById(id).classList.add("sqUncovered");
-document.getElementById(id).innerHTML = ' ';
+    if (document.getElementById(id).innerText == "☀") {
+        document.getElementById(id).classList.add("sqUncovered");
+    } else {
+        document.getElementById(id).classList.add("sqUncovered");
+        document.getElementById(id).innerHTML = ' ';
+    }
+    document.getElementById(id).setAttribute("disabled",true)
 }
 
 function getRandomMinesPosition() {
    while (nonMineCounterTag != 0) {
-    var cell = Math.floor(Math.random() * 64);
+    var cell = Math.floor(Math.random() * 63 +1);
+    console.log(cell)
     if (document.getElementById("sq-"+cell).innerText == explosionSimbol){
         nonMineCounterTag++;
     }else{
@@ -78,4 +86,36 @@ function getRandomMinesPosition() {
         nonMineCounterTag--;
     }
 }
-startGame(getMockData(mockData));
+
+function getMinesPosition(mockData) {
+    var minesPostion = []
+    var replacedMockData = mockData.replace('-','')
+   for (var i = 0; i < replacedMockData.length; i++) {
+    if(replacedMockData[i] == "x") {
+        minesPostion.push(i+1)
+    }
+   }
+   putMinesInMockData (minesPostion)
+}
+
+function putMinesInMockData (minesPostion) {
+    for (var i = 0; i < minesPostion.length; i++) {
+        document.getElementById("sq-"+minesPostion[i]).innerText = explosionSimbol
+    }
+}
+
+function gameOver(target) {
+    const arrayOfSquares = document.querySelectorAll('td')
+    if (target.classList == "sq sqUncovered" && target.innerText == "☀") {
+        for (var i = 0; i < arrayOfSquares.length; i++) {
+            if (arrayOfSquares[i].innerText == "☀") {
+                arrayOfSquares[i].classList.add("sqUncovered")
+            }
+            arrayOfSquares[i].setAttribute("disabled",true)
+        }
+        
+    }
+    
+}
+ startGame(getMockData(mockData));
+ gameOver();

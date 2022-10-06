@@ -29,9 +29,16 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
   });
 
   
-  Then('the square {string} should show an explosion simbol', function (string) {
-    // Write code here that turns the phrase above into concrete actions
-    return 'pending';
+  Then('the square {string} should show an explosion simbol',async function (string) {
+    await cellDiscover(string)
   });
 
-  
+  Then('the game should be over',async function () {
+    let text = await page.locator("text=☀").first().innerText();
+    expect(text).toBe("☀")
+  });
+
+  Given('non tagged mine counter is {string}',async function (string) {
+   let display = await page.locator("data-testid=mines").innerText();
+    expect(display).toBe(string);
+});
