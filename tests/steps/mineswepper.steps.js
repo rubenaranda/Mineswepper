@@ -28,7 +28,11 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
     expect(display).toBe("")
   });
 
-  
+  Then('the square {string} should be disabled',async function (string) {
+    const display = await page.locator('data-testid='+string).getAttribute("disabled");
+    expect(display).toBe("true")
+  });
+
   Then('the square {string} should show an explosion simbol',async function (string) {
     await cellDiscover(string)
   });
@@ -36,6 +40,28 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
   Then('the game should be over',async function () {
     let text = await page.locator("text=☀").first().innerText();
     expect(text).toBe("☀")
+  });
+
+  Then('the square {string}, {string} and {string} should be uncovered',async function (string1, string2, string3) {
+    let positions = [string1, string2, string3]
+    let result = true;
+    for (let i = 0; i < 2; i++) {
+      if (await page.locator(`[data-testid="${positions[i]}"]`).innerText() != "☀") {
+        result = false;
+        break;
+      } 
+      expect(result).toBe(true);
+  }
+  });
+
+  Then('all the squares should be disabled', async function () {
+    for (let x = 1; x < 4; x++) {
+      for (let y = 1; y < 4; y++) {
+        const cellId = x + "," + y
+        const cellStatus = await page.locator(`[data-testid="${cellId}"]`).getAttribute("disabled");
+        expect(cellStatus).toBe("true");
+      }
+    }
   });
 
   Given('non tagged mine counter is {string}',async function (string) {

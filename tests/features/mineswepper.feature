@@ -40,6 +40,11 @@ Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,1"
 Then the square "1,1" should be uncovered
 
+@actual
+Scenario: Uncover a square: -> Every time the user uncover a cell, the cell is disabled
+When the user uncover the square "1,1"
+Then the square "1,1" should be disabled
+
 Scenario: Uncover a square: -> Uncover a square with a mine
 Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,3"
@@ -129,7 +134,7 @@ Then the user wins
 Scenario: Game is Over
 Given the following mockdata is loaded: "oxo-oox-xox"
 When the user uncover the square "1,2"
-Then all the squares containg a mine should be uncovered
+Then the square "2,3", "3,1" and "3,3" should be uncovered
 And all the squares should be disabled
 
 @manual
