@@ -5,7 +5,7 @@ var cellId = 1
 var id = 1
 var explosionSimbol = "☀"
 var table = document.getElementById('sqTable')
-var squares = document.getElementsByClassName("sq");
+var square = document.getElementsByClassName("sq");
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const mockData = urlParams.get('mockData')
@@ -18,12 +18,19 @@ function getMockData(mockData) {
 function startGame (getMockData) {
     if (getMockData != null) {
         createMockTable(getMockData)
+        
         getMinesPosition(mockData)
+        console.log('manolo')
     } else {
         createTable(9,9)
         getRandomMinesPosition()
     }
+    
+    const arrayOfSquares = document.querySelectorAll('td')
+    console.log(arrayOfSquares)
 }
+
+
 
 function createMockTable(mockData) {
     createTable(mockData.length+1,mockData[0].length+1)
@@ -59,9 +66,17 @@ function createSquare(cellDataTest){
     return square
 }
 
-function clickingButtons(event) {
-    sqExposed(event.target.id)
-    gameOver(event.target);
+
+
+function clickingButtons() {
+    
+    arrayOfSquares.forEach(td => {
+        td.addEventListener('click', () => {
+            sqExposed(td.id)
+            gameOver(td)
+        })
+    })
+    
 }
 
 function sqExposed(id) {
@@ -99,8 +114,11 @@ function getMinesPosition(mockData) {
 }
 
 function putMinesInMockData (minesPostion) {
-    for (var i = 0; i < minesPostion.length; i++) {
-        document.getElementById("sq-"+minesPostion[i]).innerText = explosionSimbol
+    var mecagoentodo
+    for (var i = 0; i < minesPostion.length-1; i++) {
+        console.log(document.getElementById("sq-"+minesPostion[i]))
+       mecagoentodo = document.getElementById("sq-"+minesPostion[i])
+       mecagoentodo.innerText = "☀"
     }
 }
 
@@ -117,5 +135,20 @@ function gameOver(target) {
     }
     
 }
+
+function checkClick () {
+const arrayOfSquares = document.querySelectorAll('td')
+arrayOfSquares.forEach(td => {
+    console.log(td.id)
+    td.addEventListener('onclick', () => {
+        sqExposed(td.id)
+    })
+})
+}
+
+
  startGame(getMockData(mockData));
  gameOver();
+ 
+ 
+
