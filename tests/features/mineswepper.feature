@@ -40,7 +40,7 @@ Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,1"
 Then the square "1,1" should be uncovered
 
-@actual
+
 Scenario: Uncover a square: -> Every time the user uncover a cell, the cell is disabled
 When the user uncover the square "1,1"
 Then the square "1,1" should be disabled

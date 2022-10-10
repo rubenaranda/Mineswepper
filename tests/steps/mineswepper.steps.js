@@ -3,6 +3,10 @@ const { expect } = require('@playwright/test');
 
 const url = 'http://127.0.0.1:5500/src/html/mineswepper.html';
 
+async function cellTag (string) {
+await page.click(`[data-testid="${string}"]`, { button: "right"});
+}
+
 async function cellDiscover(string) {
 	await page.click(`[data-testid="${string}"]`, { force: true });
 }
@@ -66,5 +70,19 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
 
   Given('non tagged mine counter is {string}',async function (string) {
    let display = await page.locator("data-testid=mines").innerText();
+    expect(display).toBe(string);
+});
+
+When('the user taggs as mined the square {string}',async function (string) {
+  await cellTag(string);
+});
+
+Then('in the square {string} should appear a mined simbol',async function (string) {
+  let display = await page.locator("data-testid="+string).innerText();
+  expect(display).toBe("!")
+});
+
+Then('the non taged mine counter should by {string}',async function (string) {
+  let display = await page.locator("data-testid=mines").innerText();
     expect(display).toBe(string);
 });

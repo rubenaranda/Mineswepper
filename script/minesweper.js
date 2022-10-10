@@ -6,6 +6,8 @@ var id = 1
 var explosionSimbol = "☀"
 var table = document.getElementById('sqTable')
 var square = document.getElementsByClassName("sq");
+var charFlag = "!";
+var charQuestion = "?";
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const mockData = urlParams.get('mockData')
@@ -20,14 +22,18 @@ function startGame (getMockData) {
         createMockTable(getMockData)
         
         getMinesPosition(mockData)
-        console.log('manolo')
     } else {
         createTable(9,9)
         getRandomMinesPosition()
     }
-    
     const arrayOfSquares = document.querySelectorAll('td')
-    console.log(arrayOfSquares)
+    for (var i = 1; i < arrayOfSquares.length; i++) {
+    arrayOfSquares[i].addEventListener("contextmenu",e =>{
+        e.preventDefault()
+        document.getElementById("mines").innerText = nonMineCounterTag -1
+        setTagsInSquares(e)
+    })
+}
 }
 
 
@@ -61,44 +67,41 @@ function createSquare(cellDataTest){
     square.setAttribute("id","sq-"+cellId)
     square.setAttribute("data-testid",cellTestId)
     square.setAttribute("colspan","2")
-    square.classList.add("sq")
+    square.classList.add("sqCovered")
     cellId++
     return square
 }
 
 
 
-function clickingButtons() {
-    
-    arrayOfSquares.forEach(td => {
-        td.addEventListener('click', () => {
-            sqExposed(td.id)
-            gameOver(td)
-        })
-    })
+function clickingButtons(event) {
+    sqExposed(event.target.id)
+    gameOver(event.target.id)
     
 }
 
 function sqExposed(id) {
-    if (document.getElementById(id).innerText == "☀") {
-        document.getElementById(id).classList.add("sqUncovered");
-    } else {
-        document.getElementById(id).classList.add("sqUncovered");
-        document.getElementById(id).innerHTML = ' ';
+    var square = document.getElementById(id);
+    square.classList.remove("tagged");
+    if (square.hasAttribute("mined")) {
+        square.innerText = explosionSimbol
+        square.classList.add("sqUncovered");
+    } else if (square.className == "sqCovered") {
+        square.classList.add("sqUncovered");
+        square.innerHTML = ' ';
     }
-    document.getElementById(id).setAttribute("disabled",true)
+    square.setAttribute("disabled",true)
 }
 
 function getRandomMinesPosition() {
-   while (nonMineCounterTag != 0) {
+   while (mines != 0) {
     var cell = Math.floor(Math.random() * 63 +1);
-    console.log(cell)
-    if (document.getElementById("sq-"+cell).innerText == explosionSimbol){
-        nonMineCounterTag++;
+    if (document.getElementById("sq-"+cell).getAttribute("mined") == true){
+        mines++;
     }else{
-        document.getElementById("sq-"+cell).innerText = explosionSimbol
+        document.getElementById("sq-"+cell).setAttribute("mined",true)
         }    
-        nonMineCounterTag--;
+        mines--;
     }
 }
 
@@ -114,41 +117,39 @@ function getMinesPosition(mockData) {
 }
 
 function putMinesInMockData (minesPostion) {
-    var mecagoentodo
+    var mines
     for (var i = 0; i < minesPostion.length-1; i++) {
-        console.log(document.getElementById("sq-"+minesPostion[i]))
-       mecagoentodo = document.getElementById("sq-"+minesPostion[i])
-       mecagoentodo.innerText = "☀"
+       mines = document.getElementById("sq-"+minesPostion[i])
+       mines.setAttribute("mined",true);
     }
 }
 
-function gameOver(target) {
+function gameOver(id) {
+    var square = document.getElementById(id); 
     const arrayOfSquares = document.querySelectorAll('td')
-    if (target.classList == "sq sqUncovered" && target.innerText == "☀") {
+    if (square.className == "sqCovered sqUncovered" && square.innerText == "☀") {
         for (var i = 0; i < arrayOfSquares.length; i++) {
-            if (arrayOfSquares[i].innerText == "☀") {
+            if (arrayOfSquares[i].hasAttribute("mined")) {
+                arrayOfSquares[i].innerText = explosionSimbol
                 arrayOfSquares[i].classList.add("sqUncovered")
             }
             arrayOfSquares[i].setAttribute("disabled",true)
         }
         
-    }
-    
+    } 
 }
 
-function checkClick () {
-const arrayOfSquares = document.querySelectorAll('td')
-arrayOfSquares.forEach(td => {
-    console.log(td.id)
-    td.addEventListener('onclick', () => {
-        sqExposed(td.id)
-    })
-})
+function setTagsInSquares (event) {
+    var square = document.getElementById(event.target.id);
+  if (event.button == 2) {
+    square.classList.add("tagged")
+    square.innerText = charFlag
+    nonMineCounterTag --;
+  }
 }
-
-
  startGame(getMockData(mockData));
- gameOver();
+
+ 
  
  
 
