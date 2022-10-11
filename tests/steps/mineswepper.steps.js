@@ -82,7 +82,7 @@ Then('in the square {string} should appear a mined simbol',async function (strin
   expect(display).toBe("!")
 });
 
-Then('the non taged mine counter should by {string}',async function (string) {
+Then('the non tagged mine counter should be {string}',async function (string) {
   let display = await page.locator("data-testid=mines").innerText();
     expect(display).toBe(string);
 });
@@ -95,4 +95,23 @@ When('the user taggs as inconclusive the square {string}',async function (string
 Then('in the square {string} should appear a inconclusive simbol',async function (string) {
   let display = await page.locator("data-testid="+string).innerText();
     expect(display).toBe("?");
+});
+
+Given('the user tags as inconclusive the square {string}',async function (string) {
+  await cellTag(string);
+  await cellTag(string);
+});
+
+When('the user untags the square {string}',async function (string) {
+  await cellTag(string);
+});
+
+Then('the square {string} should appear as covered square',async function (string) {
+  let display = await page.locator(`[data-testid="${string}"]`).getAttribute("disabled");
+  expect(display).toBe(null)
+});
+
+Then('there is no simbol in the square {string}',async function (string) {
+  let display = await page.locator(`[data-testid="${string}"]`).innerText();
+  expect(display).toBe("");
 });
