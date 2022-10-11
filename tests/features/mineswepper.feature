@@ -63,7 +63,7 @@ Given non tagged mine counter is "10"
 When the user taggs as inconclusive the square "1,1"
 Then in the square "1,1" should appear a inconclusive simbol
 And the non taged mine counter should be "10"
-@actual
+
 Scenario: Tagging a square: -> Untagging a square tagged as inconclusive
 Given the user tags as inconclusive the square "1,1"
 And non tagged mine counter is "10"
@@ -74,11 +74,11 @@ And the non tagged mine counter should be "10"
 
 Scenario: Tagging a square: -> When the user tags as mined a square that is already tagged as mined
 Given non tagged mine counter is "10"
-And the square "1,1" is tagged as inconclusive
-When the user tags the square "1,1" as incoclusive again
-Then in the square "1,1" should appear a incoclusive simbol
-And the non taged mine counter should by "10"
-
+And the square "1,1" is tagged as mined
+When the user tags the square "1,1" as mined again
+Then in the square "1,1" should appear a inconclusive simbol
+And the non tagged mine counter should be "10"
+@actual
 Scenario: Tagging a square: -> Untagging a square tagged as mined
 Given the user tags as mined the square "1,1"
 And the non taged mine counter is "9"

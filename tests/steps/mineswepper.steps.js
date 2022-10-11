@@ -115,3 +115,14 @@ Then('there is no simbol in the square {string}',async function (string) {
   let display = await page.locator(`[data-testid="${string}"]`).innerText();
   expect(display).toBe("");
 });
+
+Given('the square {string} is tagged as mined',async function (string) {
+  await cellTag(string);
+});
+
+When('the user tags the square {string} as mined again',async function (string) {
+  await cellTag(string);
+});
+
+
+
