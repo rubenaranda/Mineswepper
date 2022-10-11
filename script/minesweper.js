@@ -26,11 +26,11 @@ function startGame (getMockData) {
         createTable(9,9)
         getRandomMinesPosition()
     }
+    
     const arrayOfSquares = document.querySelectorAll('td')
     for (var i = 1; i < arrayOfSquares.length; i++) {
     arrayOfSquares[i].addEventListener("contextmenu",e =>{
         e.preventDefault()
-        document.getElementById("mines").innerText = nonMineCounterTag -1
         setTagsInSquares(e)
     })
 }
@@ -141,11 +141,25 @@ function gameOver(id) {
 
 function setTagsInSquares (event) {
     var square = document.getElementById(event.target.id);
-  if (event.button == 2) {
-    square.classList.add("tagged")
-    square.innerText = charFlag
+  if (event.button == 2 && !square.hasAttribute("minedtag") && !square.hasAttribute("inconclusivetag")) {
+    square.classList.add("minetag");
+    square.setAttribute("minedtag", true);
+    square.innerText = charFlag;
     nonMineCounterTag --;
-  }
+  } else if (event.button == 2 && square.hasAttribute("minedtag")) {
+    square.classList.remove ("minetag")
+    square.classList.add ("inconclusivetag")
+    square.removeAttribute("minedtag")
+    square.setAttribute("inconclusivetag",true)
+    square.innerText = charQuestion;
+    nonMineCounterTag ++;
+  } else if (event.button == 2 && square.hasAttribute("inconclusivetag")){
+    console.log("hola")
+    square.classList.remove("inconclusivetag")
+    square.removeAttribute("inconclusivetag")
+    square.innerText = '';
+  } 
+  document.getElementById("mines").innerText = nonMineCounterTag;
 }
  startGame(getMockData(mockData));
 

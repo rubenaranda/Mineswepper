@@ -86,3 +86,13 @@ Then('the non taged mine counter should by {string}',async function (string) {
   let display = await page.locator("data-testid=mines").innerText();
     expect(display).toBe(string);
 });
+
+When('the user taggs as inconclusive the square {string}',async function (string) {
+  await cellTag(string);
+  await cellTag(string);
+});
+
+Then('in the square {string} should appear a inconclusive simbol',async function (string) {
+  let display = await page.locator("data-testid="+string).innerText();
+    expect(display).toBe("?");
+});

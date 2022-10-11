@@ -83,7 +83,11 @@ div.counter {
     cursor: pointer;
 }
 
-.tagged {
+.minetag {
+    font-size: 15px;
+}
+
+.inconclusivetag {
     font-size: 15px;
 }
 

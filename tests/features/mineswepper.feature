@@ -50,13 +50,14 @@ Given the following mockdata is loaded: "oox-xox"
 When the user uncover the square "1,3"
 Then the square "1,3" should show an explosion simbol
 And the game should be over
-@actual
+
 Scenario: Tagging a square: -> When a user thinks the square contains a mine then user can tag the square as mined
 Given non tagged mine counter is "10" 
 When the user taggs as mined the square "1,1" 
 Then in the square "1,1" should appear a mined simbol
 And the non taged mine counter should by "9"
 
+@actual
 Scenario: Tagging a square: -> When the user dont have enough information about the square can tag it as inconclusive
 Given non tagged mine counter is "10"
 When the user taggs as inconclusive the square "1,1"
