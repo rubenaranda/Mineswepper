@@ -78,7 +78,7 @@ And the square "1,1" is tagged as mined
 When the user tags the square "1,1" as mined again
 Then in the square "1,1" should appear a inconclusive simbol
 And the non tagged mine counter should be "10"
-@actual
+@manual
 Scenario: Tagging a square: -> Untagging a square tagged as mined
 Given the user tags as mined the square "1,1"
 And the non taged mine counter is "9"
@@ -86,7 +86,7 @@ When the user untags the square "1,1"
 Then the square "1,1" should appear as covered square
 And there is no simbol in the square "1,1"
 And the non tagged mine counter should be "10"
-
+@maunal
 Scenario: Tagging a square: -> When the user tags as incoclusive a square that is already tagged as inconclusive
 Given non tagged mine counter is "10"
 And the square "1,1" is tagged as mined
@@ -94,21 +94,11 @@ When the user tags the square "1,1" as mined again
 Then in the square "1,1" should appear a mined simbol
 And the non taged mine counter should by "9"
 
-
+@actual
 Scenario: Tagging a square: -> When the user tags as mined more squares than the non taged mine counter  
-Given the following mockdata is loaded: <mockdata>
-And the non taged mine counter is "3"
-When the user tags this number of squares as mined : <numbers>
-Then the non taged mine counter should be : <nontagedminecounter>
-
-Examples:
-|   mockdata          |   numbers  |    nontagedminecounter  |
-|   !oo-xoo-ooo       |   1        |            2            |
-|   !oo-!oo-ooo       |   2        |            1            |
-|   !o!-!oo-ooo       |   3        |            0            |
-|   !o!-!oo-!oo       |   4        |           -1            |
-|   !o!-!oo-!o!       |   5        |           -2            |
-
+Given the following mockdata is loaded: "!xo-!xo-!oo" 
+When the user tags this number of squares as mined : "3"
+Then the non tagged mine counter should be "-1"
 
 Scenario Outline: Uncover a square: -> Uncover an empty square with one or more adjacent mines
 Given the following mockdata is loaded: <mockdata>
