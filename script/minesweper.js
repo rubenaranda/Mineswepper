@@ -20,11 +20,11 @@ function getMockData(mockData) {
 function startGame (getMockData) {
     if (getMockData != null) {
         createMockTable(getMockData)
-        
         getMinesPosition(mockData)
     } else {
         createTable(9,9)
         getRandomMinesPosition()
+        console.log(mines)
     }
     
     const arrayOfSquares = document.querySelectorAll('td')
@@ -98,30 +98,52 @@ function getRandomMinesPosition() {
     var cell = Math.floor(Math.random() * 63 +1);
     if (document.getElementById("sq-"+cell).getAttribute("mined") == true){
         mines++;
+        console.log(mines)
     }else{
         document.getElementById("sq-"+cell).setAttribute("mined",true)
         }    
         mines--;
+        console.log(mines)
     }
+    console.log(mines)    
 }
 
 function getMinesPosition(mockData) {
     var minesPostion = []
+    var tagsPosition = []
     var replacedMockData = mockData.replace('-','')
    for (var i = 0; i < replacedMockData.length; i++) {
     if(replacedMockData[i] == "x") {
         minesPostion.push(i+1)
+    } else if (replacedMockData[i] == "!") {
+        tagsPosition.push(i+1)
     }
    }
+   mines = minesPostion.length
+   nonMineCounterTag = mines 
    putMinesInMockData (minesPostion)
+   putTagsInMockData (tagsPosition)
 }
 
 function putMinesInMockData (minesPostion) {
     var mines
-    for (var i = 0; i < minesPostion.length-1; i++) {
+    for (var i = 0; i < minesPostion.length; i++) {
        mines = document.getElementById("sq-"+minesPostion[i])
        mines.setAttribute("mined",true);
     }
+}
+
+function putTagsInMockData (tagsPosition) {
+    var tags
+    for (var i = 0; i < tagsPosition.length; i++) {
+       tags = document.getElementById("sq-"+tagsPosition[i])
+        tags.classList.add("minetag");
+        tags.setAttribute("minedtag", true);
+        tags.innerText = charFlag;
+        nonMineCounterTag --;
+        console.log(nonMineCounterTag)
+    }
+    document.getElementById("mines").innerText = nonMineCounterTag;
 }
 
 function gameOver(id) {
@@ -154,7 +176,6 @@ function setTagsInSquares (event) {
     square.innerText = charQuestion;
     nonMineCounterTag ++;
   } else if (event.button == 2 && square.hasAttribute("inconclusivetag")){
-    console.log("hola")
     square.classList.remove("inconclusivetag")
     square.removeAttribute("inconclusivetag")
     square.innerText = '';
