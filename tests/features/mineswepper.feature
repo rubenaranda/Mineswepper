@@ -94,16 +94,16 @@ When the user tags the square "1,1" as mined again
 Then in the square "1,1" should appear a mined simbol
 And the non taged mine counter should by "9"
 
-@actual
+
 Scenario: Tagging a square: -> When the user tags as mined more squares than the non taged mine counter  
 Given the following mockdata is loaded: "!xo-!xo-!oo" 
 When the user tags this number of squares as mined : "3"
 Then the non tagged mine counter should be "-1"
-
+@actual
 Scenario Outline: Uncover a square: -> Uncover an empty square with one or more adjacent mines
-Given the following mockdata is loaded: <mockdata>
+Given the following mockdata is loaded: "<mockdata>"
 When the user uncover the square "2,2"
-Then in the square "2,2" should contains this number of adjacent mines: <numbers>
+Then in the square "2,2" should contains this number of adjacent mines: "<numbers>"
 
 Examples:
 |   mockdata          |   numbers  |

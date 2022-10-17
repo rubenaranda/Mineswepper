@@ -4,7 +4,8 @@ var nonMineCounterTag = 10
 var cellId = 1
 var id = 1
 var explosionSimbol = "☀"
-var table = document.getElementById('sqTable')
+var mineDataMap = new Map();
+var boardMap = new Map();
 var square = document.getElementsByClassName("sq");
 var charFlag = "!";
 var charQuestion = "?";
@@ -24,7 +25,7 @@ function startGame (getMockData) {
     } else {
         createTable(9,9)
         getRandomMinesPosition()
-        console.log(mines)
+        console.log(mineDataMap)
     }
     
     const arrayOfSquares = document.querySelectorAll('td')
@@ -44,13 +45,50 @@ function createMockTable(mockData) {
 
 // Fuction to create the table of the mineswepper
 
-function createTable(heigh,width){  
+function createTableHead(){
+    var trHead = document.createElement('tr');
+    trHead.setAttribute('id',0);
+    trHead.setAttribute('data-testid',0)
+
+    var tdHead = document.createElement('td');
+    tdHead.classList.add('score');
+    tdHead.setAttribute('colspan',80);
+
+    var divCounter = document.createElement('div');
+    divCounter.classList.add('counter');
+    divCounter.setAttribute('id','mines');
+    divCounter.setAttribute('data-testid','mines');
+    divCounter.textContent = '0'
+
+    var imgSimley = document.createElement('img');
+    imgSimley.setAttribute('id','smiley');
+    imgSimley.setAttribute('src','/src/images/smiley.gif');
+
+    var divTimer = document.createElement('div');
+    divTimer.setAttribute('id','time');
+    divTimer.classList.add('counter');
+    divTimer.textContent = '0';
+
+    tdHead.append(divCounter,imgSimley,divTimer);
+    trHead.appendChild(tdHead);
+
+    return trHead
+}
+
+function createTable(heigh,width){ 
+    var body = document.getElementsByTagName('body')[0];
+    var table = document.createElement('table');
+    table.setAttribute('id','sqTable');
+    table.setAttribute('onclick',"clickingButtons(event)")
+    table.appendChild(createTableHead()); 
     for (let i = 1; i < heigh; i++){
         var row = createRow(width)
         row.setAttribute("id",i)
         table.appendChild(row)
         id++;
     }
+    body.append(table);
+    console.log(table)
 }
 function createRow(width){
     var row = document.createElement("tr")
@@ -68,44 +106,38 @@ function createSquare(cellDataTest){
     square.setAttribute("data-testid",cellTestId)
     square.setAttribute("colspan","2")
     square.classList.add("sqCovered")
+    boardMap.set("sq-"+cellId,"sqCovered")
     cellId++
     return square
 }
 
-
-
 function clickingButtons(event) {
     sqExposed(event.target.id)
     gameOver(event.target.id)
-    
 }
 
 function sqExposed(id) {
     var square = document.getElementById(id);
-    square.classList.remove("tagged");
-    if (square.hasAttribute("mined")) {
+    square.classList.remove("minetag");
+    if (mineDataMap.has(id)) {
         square.innerText = explosionSimbol
         square.classList.add("sqUncovered");
-    } else if (square.className == "sqCovered") {
+    } else if (boardMap.get(id) == "sqCovered") {
         square.classList.add("sqUncovered");
-        square.innerHTML = ' ';
     }
+    boardMap.set(id, "sqUncovered");
     square.setAttribute("disabled",true)
+    getAdjecentMines (id)
 }
 
 function getRandomMinesPosition() {
    while (mines != 0) {
     var cell = Math.floor(Math.random() * 63 +1);
-    if (document.getElementById("sq-"+cell).getAttribute("mined") == true){
-        mines++;
-        console.log(mines)
-    }else{
-        document.getElementById("sq-"+cell).setAttribute("mined",true)
-        }    
+    if (!mineDataMap.has(cell)){
         mines--;
-        console.log(mines)
+        mineDataMap.set("sq-"+cell,"sqCovered")
+     }
     }
-    console.log(mines)    
 }
 
 function getMinesPosition(mockData) {
@@ -141,7 +173,6 @@ function putTagsInMockData (tagsPosition) {
         tags.setAttribute("minedtag", true);
         tags.innerText = charFlag;
         nonMineCounterTag --;
-        console.log(nonMineCounterTag)
     }
     document.getElementById("mines").innerText = nonMineCounterTag;
 }
@@ -149,6 +180,13 @@ function putTagsInMockData (tagsPosition) {
 function gameOver(id) {
     var square = document.getElementById(id); 
     const arrayOfSquares = document.querySelectorAll('td')
+
+
+    // if (mineDataMap.has(id)) {
+        // mineDataMap.forEach(function(value,key){
+        //boardMap.set(key, "mined")
+    //})}
+
     if (square.className == "sqCovered sqUncovered" && square.innerText == "☀") {
         for (var i = 0; i < arrayOfSquares.length; i++) {
             if (arrayOfSquares[i].hasAttribute("mined")) {
@@ -182,9 +220,18 @@ function setTagsInSquares (event) {
   } 
   document.getElementById("mines").innerText = nonMineCounterTag;
 }
+
+function getAdjecentMines (id) {
+    var numId = parseInt(id.split("-")[1])
+    var square = document.getElementById(id);
+    const arrayOfTr = document.querySelectorAll("tr");
+    }
  startGame(getMockData(mockData));
 
- 
+ function laFUNCION () {
+    // Esta funcion es la FUNCION que actualiza el html segun el boardMap
+
+ }
  
  
 
