@@ -12,101 +12,100 @@ var charQuestion = "?";
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const mockData = urlParams.get('mockData')
- 
+
 
 function getMockData(mockData) {
-    return new URLSearchParams(window.location.search).has('mockData')?mockData.split('-'):null;
+    return new URLSearchParams(window.location.search).has('mockData') ? mockData.split('-') : null;
 }
 
-function startGame (getMockData) {
+function startGame(getMockData) {
     if (getMockData != null) {
         createMockTable(getMockData)
         getMinesPosition(mockData)
     } else {
-        createTable(9,9)
+        createTable(9, 9)
         getRandomMinesPosition()
         console.log(mineDataMap)
     }
-    
+
     const arrayOfSquares = document.querySelectorAll('td')
     for (var i = 1; i < arrayOfSquares.length; i++) {
-    arrayOfSquares[i].addEventListener("contextmenu",e =>{
-        e.preventDefault()
-        setTagsInSquares(e)
-    })
-}
+        arrayOfSquares[i].addEventListener("contextmenu", e => {
+            e.preventDefault()
+            setTagsInSquares(e)
+        })
+    }
 }
 
 
 
 function createMockTable(mockData) {
-    createTable(mockData.length+1,mockData[0].length+1)
+    createTable(mockData.length + 1, mockData[0].length + 1)
 }
 
 // Fuction to create the table of the mineswepper
 
-function createTableHead(){
+function createTableHead() {
     var trHead = document.createElement('tr');
-    trHead.setAttribute('id',0);
-    trHead.setAttribute('data-testid',0)
+    trHead.setAttribute('id', 0);
+    trHead.setAttribute('data-testid', 0)
 
     var tdHead = document.createElement('td');
     tdHead.classList.add('score');
-    tdHead.setAttribute('colspan',80);
+    tdHead.setAttribute('colspan', 80);
 
     var divCounter = document.createElement('div');
     divCounter.classList.add('counter');
-    divCounter.setAttribute('id','mines');
-    divCounter.setAttribute('data-testid','mines');
-    divCounter.textContent = '0'
+    divCounter.setAttribute('id', 'mines');
+    divCounter.setAttribute('data-testid', 'mines');
+    divCounter.textContent = nonMineCounterTag
 
     var imgSimley = document.createElement('img');
-    imgSimley.setAttribute('id','smiley');
-    imgSimley.setAttribute('src','/src/images/smiley.gif');
+    imgSimley.setAttribute('id', 'smiley');
+    imgSimley.setAttribute('src', '/src/images/smiley.gif');
 
     var divTimer = document.createElement('div');
-    divTimer.setAttribute('id','time');
+    divTimer.setAttribute('id', 'time');
     divTimer.classList.add('counter');
     divTimer.textContent = '0';
 
-    tdHead.append(divCounter,imgSimley,divTimer);
+    tdHead.append(divCounter, imgSimley, divTimer);
     trHead.appendChild(tdHead);
 
     return trHead
 }
 
-function createTable(heigh,width){ 
+function createTable(heigh, width) {
     var body = document.getElementsByTagName('body')[0];
     var table = document.createElement('table');
-    table.setAttribute('id','sqTable');
-    table.setAttribute('onclick',"clickingButtons(event)")
-    table.appendChild(createTableHead()); 
-    for (let i = 1; i < heigh; i++){
+    table.setAttribute('id', 'sqTable');
+    table.setAttribute('onclick', "clickingButtons(event)")
+    table.appendChild(createTableHead());
+    for (let i = 1; i < heigh; i++) {
         var row = createRow(width)
-        row.setAttribute("id",i)
+        row.setAttribute("id", i)
         table.appendChild(row)
         id++;
     }
     body.append(table);
-    console.log(table)
 }
-function createRow(width){
+function createRow(width) {
     var row = document.createElement("tr")
     var cellDataTest = 1
-    for (let i = 1; i < width; i++){
+    for (let i = 1; i < width; i++) {
         row.appendChild(createSquare(cellDataTest))
         cellDataTest++
     }
     return row
 }
-function createSquare(cellDataTest){
+function createSquare(cellDataTest) {
     var square = document.createElement("td")
-    var cellTestId = id+","+cellDataTest
-    square.setAttribute("id","sq-"+cellId)
-    square.setAttribute("data-testid",cellTestId)
-    square.setAttribute("colspan","2")
+    var cellTestId = id + "," + cellDataTest
+    square.setAttribute("id", "sq-" + cellId)
+    square.setAttribute("data-testid", cellTestId)
+    square.setAttribute("colspan", "2")
     square.classList.add("sqCovered")
-    boardMap.set("sq-"+cellId,"sqCovered")
+    boardMap.set("sq-" + cellId, "sqCovered")
     cellId++
     return square
 }
@@ -114,124 +113,154 @@ function createSquare(cellDataTest){
 function clickingButtons(event) {
     sqExposed(event.target.id)
     gameOver(event.target.id)
+    boardMapUpdate()
 }
 
 function sqExposed(id) {
     var square = document.getElementById(id);
-    square.classList.remove("minetag");
+    boardMap.set(square.id,"sqCovered")
+    square.classList.remove("minetag")
     if (mineDataMap.has(id)) {
         square.innerText = explosionSimbol
         square.classList.add("sqUncovered");
     } else if (boardMap.get(id) == "sqCovered") {
+        square.innerText = ""
         square.classList.add("sqUncovered");
     }
     boardMap.set(id, "sqUncovered");
-    square.setAttribute("disabled",true)
-    getAdjecentMines (id)
+    square.setAttribute("disabled", true)
+    getAdjecentMines(id)
 }
 
 function getRandomMinesPosition() {
-   while (mines != 0) {
-    var cell = Math.floor(Math.random() * 63 +1);
-    if (!mineDataMap.has(cell)){
-        mines--;
-        mineDataMap.set("sq-"+cell,"sqCovered")
-     }
+    while (mines != 0) {
+        var cell = Math.floor(Math.random() * 63 + 1);
+        if (!mineDataMap.has(cell)) {
+            mines--;
+            mineDataMap.set("sq-" + cell, "sqCovered")
+        }
     }
 }
 
 function getMinesPosition(mockData) {
     var minesPostion = []
     var tagsPosition = []
-    var replacedMockData = mockData.replace('-','')
-   for (var i = 0; i < replacedMockData.length; i++) {
-    if(replacedMockData[i] == "x") {
-        minesPostion.push(i+1)
-    } else if (replacedMockData[i] == "!") {
-        tagsPosition.push(i+1)
+    var replacedMockData = mockData.replace('-', '')
+    for (var i = 0; i < replacedMockData.length; i++) {
+        if (replacedMockData[i] == "x") {
+            minesPostion.push(i + 1)
+        } else if (replacedMockData[i] == "!") {
+            tagsPosition.push(i + 1)
+        }
     }
-   }
-   mines = minesPostion.length
-   nonMineCounterTag = mines 
-   putMinesInMockData (minesPostion)
-   putTagsInMockData (tagsPosition)
+    mines = minesPostion.length
+    nonMineCounterTag = mines
+    putMinesInMockData(minesPostion)
+    putTagsInMockData(tagsPosition)
 }
 
-function putMinesInMockData (minesPostion) {
+function putMinesInMockData(minesPostion) {
     var mines
     for (var i = 0; i < minesPostion.length; i++) {
-       mines = document.getElementById("sq-"+minesPostion[i])
-       mines.setAttribute("mined",true);
+        mines = document.getElementById("sq-" + minesPostion[i])
+        mines.setAttribute("mined", true);
     }
 }
 
-function putTagsInMockData (tagsPosition) {
+function putTagsInMockData(tagsPosition) {
     var tags
     for (var i = 0; i < tagsPosition.length; i++) {
-       tags = document.getElementById("sq-"+tagsPosition[i])
+        tags = document.getElementById("sq-" + tagsPosition[i])
         tags.classList.add("minetag");
         tags.setAttribute("minedtag", true);
         tags.innerText = charFlag;
-        nonMineCounterTag --;
+        nonMineCounterTag--;
     }
     document.getElementById("mines").innerText = nonMineCounterTag;
 }
 
 function gameOver(id) {
-    var square = document.getElementById(id); 
-    const arrayOfSquares = document.querySelectorAll('td')
+    var square = document.getElementById(id);
+    var arrayOfSquares = document.querySelectorAll('td')
 
+    if (mineDataMap.has(id)) {
+        mineDataMap.forEach(function (value, key) {
+            boardMap.set(key, "mined")
+        })
 
-    // if (mineDataMap.has(id)) {
-        // mineDataMap.forEach(function(value,key){
-        //boardMap.set(key, "mined")
-    //})}
-
-    if (square.className == "sqCovered sqUncovered" && square.innerText == "☀") {
-        for (var i = 0; i < arrayOfSquares.length; i++) {
-            if (arrayOfSquares[i].hasAttribute("mined")) {
-                arrayOfSquares[i].innerText = explosionSimbol
-                arrayOfSquares[i].classList.add("sqUncovered")
-            }
+        boardMap.forEach(function (value, key) {
+           if (value == "mined") {
+            document.getElementById(key).innerText = explosionSimbol
+            document.getElementById(key).classList.add("sqUncovered")
+           } 
+           for (var i = 0; i < arrayOfSquares.length; i++) {
             arrayOfSquares[i].setAttribute("disabled",true)
+           }
+        })
+    }
+}
+
+function setTagsInSquares(event) {
+    var square = document.getElementById(event.target.id);
+    boardMap.forEach(function (value, key) {
+        if (event.button == 2 && value != "minedtag" && value != "inconclusivetag") {
+            boardMap.set(event.target.id, "minedtag")
+            square.classList.add("minetag");
+            square.innerText = charFlag;
+            nonMineCounterTag --;
+        } else if (event.button == 2 && value == "minedtag") {
+            boardMap.set(event.target.id, "inconclusivetag")
+            square.classList.remove("minetag")
+            square.classList.add("inconclusivetag")
+            nonMineCounterTag++;
+        } else if (event.button == 2 && value == "inconclusivetag") {
+            boardMap.set(event.target.id,"sqCovered")
+            square.classList.remove("inconclusivetag")
+            square.innerText = '';
         }
         
-    } 
+    })
+   /* if (event.button == 2 && !square.hasAttribute("minedtag") && !square.hasAttribute("inconclusivetag")) {
+        square.classList.add("minetag");
+        square.setAttribute("minedtag", true);
+        square.innerText = charFlag;
+        nonMineCounterTag--;
+    } else if (event.button == 2 && square.hasAttribute("minedtag")) {
+        square.classList.remove("minetag")
+        square.classList.add("inconclusivetag")
+        square.removeAttribute("minedtag")
+        square.setAttribute("inconclusivetag", true)
+        square.innerText = charQuestion;
+        nonMineCounterTag++;
+    } else if (event.button == 2 && square.hasAttribute("inconclusivetag")) {
+        square.classList.remove("inconclusivetag")
+        square.removeAttribute("inconclusivetag")
+        square.innerText = '';
+    }
+    document.getElementById("mines").innerText = nonMineCounterTag;*/
 }
 
-function setTagsInSquares (event) {
-    var square = document.getElementById(event.target.id);
-  if (event.button == 2 && !square.hasAttribute("minedtag") && !square.hasAttribute("inconclusivetag")) {
-    square.classList.add("minetag");
-    square.setAttribute("minedtag", true);
-    square.innerText = charFlag;
-    nonMineCounterTag --;
-  } else if (event.button == 2 && square.hasAttribute("minedtag")) {
-    square.classList.remove ("minetag")
-    square.classList.add ("inconclusivetag")
-    square.removeAttribute("minedtag")
-    square.setAttribute("inconclusivetag",true)
-    square.innerText = charQuestion;
-    nonMineCounterTag ++;
-  } else if (event.button == 2 && square.hasAttribute("inconclusivetag")){
-    square.classList.remove("inconclusivetag")
-    square.removeAttribute("inconclusivetag")
-    square.innerText = '';
-  } 
-  document.getElementById("mines").innerText = nonMineCounterTag;
-}
-
-function getAdjecentMines (id) {
+function getAdjecentMines(id) {
     var numId = parseInt(id.split("-")[1])
     var square = document.getElementById(id);
     const arrayOfTr = document.querySelectorAll("tr");
+}
+
+
+startGame(getMockData(mockData));
+
+function boardMapUpdate() {
+    var arrayOfSquares = document.querySelectorAll('td')
+    for (var i = 0; i < arrayOfSquares.length; i++) {
+        boardMap.forEach(function (value,key) {
+            if (arrayOfSquares[i] == key) {
+                boardMap.set(arrayOfSquares[i],arrayOfSquares[i].getAttributeNames())
+            }
+        })
     }
- startGame(getMockData(mockData));
+   
+   return boardMap
+}
 
- function laFUNCION () {
-    // Esta funcion es la FUNCION que actualiza el html segun el boardMap
 
- }
- 
- 
 
