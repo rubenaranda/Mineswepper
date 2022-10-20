@@ -9,6 +9,8 @@ var boardMap = new Map();
 var square = document.getElementsByClassName("sq");
 var charFlag = "!";
 var charQuestion = "?";
+var numberOfRows = 8;
+var numberOfColumns = 8;
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 const mockData = urlParams.get('mockData')
@@ -23,7 +25,7 @@ function startGame(getMockData) {
         createMockTable(getMockData)
         getMinesPosition(mockData)
     } else {
-        createTable(9, 9)
+        createTable(numberOfColumns, numberOfRows)
         getRandomMinesPosition()
         console.log(mineDataMap)
     }
@@ -81,7 +83,7 @@ function createTable(heigh, width) {
     table.setAttribute('id', 'sqTable');
     table.setAttribute('onclick', "clickingButtons(event)")
     table.appendChild(createTableHead());
-    for (let i = 1; i < heigh; i++) {
+    for (let i = 1; i <= heigh; i++) {
         var row = createRow(width)
         row.setAttribute("id", i)
         table.appendChild(row)
@@ -92,7 +94,7 @@ function createTable(heigh, width) {
 function createRow(width) {
     var row = document.createElement("tr")
     var cellDataTest = 1
-    for (let i = 1; i < width; i++) {
+    for (let i = 1; i <= width; i++) {
         row.appendChild(createSquare(cellDataTest))
         cellDataTest++
     }
@@ -104,40 +106,47 @@ function createSquare(cellDataTest) {
     square.setAttribute("id", "sq-" + cellId)
     square.setAttribute("data-testid", cellTestId)
     square.setAttribute("colspan", "2")
-    square.classList.add("sqCovered")
-    boardMap.set("sq-" + cellId, "sqCovered")
+    square.classList.add("sqCovered");
+    boardMap.set("sq-" + cellId, ["sqCovered"])
     cellId++
     return square
 }
 
+function boardMapUpdate(id) {
+    boardMap.forEach(function (value, key) {
+        if (value.includes("sqUncovered") && value.includes("AdjacentMine")){
+            document.getElementById(key).classList.add("sqUncovered")
+            var number = boardMap.get(key)[boardMap.get(key).length-1]
+            document.getElementById(key).innerText = number
+        } else if (value.includes("explosion")){
+            document.getElementById(key).innerHTML = explosionSimbol
+            document.getElementById(key).classList.add("sqUncovered")
+        }
+    })
+}
+
 function clickingButtons(event) {
     sqExposed(event.target.id)
-    gameOver(event.target.id)
-    boardMapUpdate()
+    boardMapUpdate(event.target.id)
 }
 
 function sqExposed(id) {
     var square = document.getElementById(id);
-    boardMap.set(square.id,"sqCovered")
-    square.classList.remove("minetag")
-    if (mineDataMap.has(id)) {
-        square.innerText = explosionSimbol
-        square.classList.add("sqUncovered");
-    } else if (boardMap.get(id) == "sqCovered") {
-        square.innerText = ""
-        square.classList.add("sqUncovered");
+    if (mineDataMap.has(id)){
+        gameOver(id)
+    } else{
+        boardMap.get(id).push("sqUncovered");
+        boardMap.get(id).shift();
+        getAdjecentMines(id)
     }
-    boardMap.set(id, "sqUncovered");
-    square.setAttribute("disabled", true)
-    getAdjecentMines(id)
 }
 
 function getRandomMinesPosition() {
     while (mines != 0) {
         var cell = Math.floor(Math.random() * 63 + 1);
-        if (!mineDataMap.has(cell)) {
+        if (!mineDataMap.has("sq-"+cell)) {
             mines--;
-            mineDataMap.set("sq-" + cell, "sqCovered")
+            mineDataMap.set("sq-" + cell, ["mined"])
         }
     }
 }
@@ -181,86 +190,56 @@ function putTagsInMockData(tagsPosition) {
 
 function gameOver(id) {
     var square = document.getElementById(id);
-    var arrayOfSquares = document.querySelectorAll('td')
-
-    if (mineDataMap.has(id)) {
         mineDataMap.forEach(function (value, key) {
-            boardMap.set(key, "mined")
-        })
-
-        boardMap.forEach(function (value, key) {
-           if (value == "mined") {
-            document.getElementById(key).innerText = explosionSimbol
-            document.getElementById(key).classList.add("sqUncovered")
-           } 
-           for (var i = 0; i < arrayOfSquares.length; i++) {
-            arrayOfSquares[i].setAttribute("disabled",true)
-           }
+                boardMap.get(key).push("explosion")
+                boardMap.get(key).shift();
         })
     }
-}
 
 function setTagsInSquares(event) {
     var square = document.getElementById(event.target.id);
     boardMap.forEach(function (value, key) {
-        if (event.button == 2 && value != "minedtag" && value != "inconclusivetag") {
-            boardMap.set(event.target.id, "minedtag")
+        if (key == square.id && value.includes("sqCovered") && !value.includes("mined") && !value.includes("inconclusivetag")) {
             square.classList.add("minetag");
+            boardMap.get(key).push("mined")
             square.innerText = charFlag;
-            nonMineCounterTag --;
-        } else if (event.button == 2 && value == "minedtag") {
-            boardMap.set(event.target.id, "inconclusivetag")
+            nonMineCounterTag--;
+            console.log(key, value)
+        } else if (key == square.id && value.includes("mined")) {
             square.classList.remove("minetag")
             square.classList.add("inconclusivetag")
+            boardMap.get(key).pop();
+            boardMap.get(key).push("inconclusivetag")
+            square.innerText = charQuestion;
             nonMineCounterTag++;
-        } else if (event.button == 2 && value == "inconclusivetag") {
-            boardMap.set(event.target.id,"sqCovered")
-            square.classList.remove("inconclusivetag")
+            console.log(value)
+        } else if (key == square.id && value.includes("inconclusivetag")) {
+            boardMap.get(key).pop();
             square.innerText = '';
         }
-        
     })
-   /* if (event.button == 2 && !square.hasAttribute("minedtag") && !square.hasAttribute("inconclusivetag")) {
-        square.classList.add("minetag");
-        square.setAttribute("minedtag", true);
-        square.innerText = charFlag;
-        nonMineCounterTag--;
-    } else if (event.button == 2 && square.hasAttribute("minedtag")) {
-        square.classList.remove("minetag")
-        square.classList.add("inconclusivetag")
-        square.removeAttribute("minedtag")
-        square.setAttribute("inconclusivetag", true)
-        square.innerText = charQuestion;
-        nonMineCounterTag++;
-    } else if (event.button == 2 && square.hasAttribute("inconclusivetag")) {
-        square.classList.remove("inconclusivetag")
-        square.removeAttribute("inconclusivetag")
-        square.innerText = '';
-    }
-    document.getElementById("mines").innerText = nonMineCounterTag;*/
+    document.getElementById("mines").innerText = nonMineCounterTag;
 }
 
 function getAdjecentMines(id) {
-    var numId = parseInt(id.split("-")[1])
-    var square = document.getElementById(id);
-    const arrayOfTr = document.querySelectorAll("tr");
+    var splitedId = id.split("-")[1]
+    let position = [-9,-8,-7,-1,1,7,8,9]
+    let numberOfMines = 0;
+    for (var x = 0; x < position.length; x++){
+        var newSplitedId = parseInt(splitedId) + position[x]
+       if(mineDataMap.has("sq-"+newSplitedId)){
+        numberOfMines ++;
+       }
+    }
+    boardMap.get(id).push("AdjacentMine")
+    boardMap.get(id).push(numberOfMines)
 }
 
 
 startGame(getMockData(mockData));
 
-function boardMapUpdate() {
-    var arrayOfSquares = document.querySelectorAll('td')
-    for (var i = 0; i < arrayOfSquares.length; i++) {
-        boardMap.forEach(function (value,key) {
-            if (arrayOfSquares[i] == key) {
-                boardMap.set(arrayOfSquares[i],arrayOfSquares[i].getAttributeNames())
-            }
-        })
-    }
-   
-   return boardMap
-}
+
+
 
 
 

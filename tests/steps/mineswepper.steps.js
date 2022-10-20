@@ -34,17 +34,13 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
 
   Then('the square {string} should be disabled',async function (string) {
     const display = await page.locator('data-testid='+string).getAttribute("disabled");
-    expect(display).toBe("true")
+    expect(display).toBe("disabled")
   });
 
   Then('the square {string} should show an explosion simbol',async function (string) {
     await cellDiscover(string)
   });
 
-  Then('the game should be over',async function () {
-    let text = await page.locator("text=☀").first().innerText();
-    expect(text).toBe("☀")
-  });
 
   Then('the square {string}, {string} and {string} should be uncovered',async function (string1, string2, string3) {
     let positions = [string1, string2, string3]
