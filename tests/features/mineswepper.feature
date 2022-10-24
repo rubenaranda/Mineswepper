@@ -84,19 +84,13 @@ When the user untags the square "1,1"
 Then the square "1,1" should appear as covered square
 And there is no simbol in the square "1,1"
 And the non tagged mine counter should be "10"
-@maunal
-Scenario: Tagging a square: -> When the user tags as incoclusive a square that is already tagged as inconclusive
-Given non tagged mine counter is "10"
-And the square "1,1" is tagged as mined
-When the user tags the square "1,1" as mined again
-Then in the square "1,1" should appear a mined simbol
-And the non taged mine counter should by "9"
 
 
 Scenario: Tagging a square: -> When the user tags as mined more squares than the non taged mine counter  
-Given the following mockdata is loaded: "!xo-!xo-!oo" 
-When the user tags this number of squares as mined : "3"
+Given the following mockdata is loaded: "oxo-oxo-ooo" 
+When the user tags the square "1,1","1,3","2,1"
 Then the non tagged mine counter should be "-1"
+
 @actual
 Scenario Outline: Uncover a square: -> Uncover an empty square with one or more adjacent mines
 Given the following mockdata is loaded: "<mockdata>"

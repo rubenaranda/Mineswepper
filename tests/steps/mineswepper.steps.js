@@ -120,16 +120,10 @@ When('the user tags the square {string} as mined again',async function (string) 
   await cellTag(string);
 });
 
-When('the user tags this number of squares as mined : {string}',async function (string) {
-  let minedTag = 0
-  const cells = await page.locator("td.sqCovered")
-  for (let x = 0; x < await cells.count(); x++) {
-      const cell = await cells.nth(x).innerText();
-      if (cell == "!") {
-        minedTag ++;
-      }
-  }
-  expect(minedTag.toString()).toBe(string)
+When('the user tags the square {string},{string},{string}',async function (string, string2, string3) {
+  await cellTag(string)
+  await cellTag(string2)
+  await cellTag(string3)
 });
 
 
