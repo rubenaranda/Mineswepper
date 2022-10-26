@@ -76,14 +76,6 @@ And the square "1,1" is tagged as mined
 When the user tags the square "1,1" as mined again
 Then in the square "1,1" should appear a inconclusive simbol
 And the non tagged mine counter should be "10"
-@manual
-Scenario: Tagging a square: -> Untagging a square tagged as mined
-Given the user tags as mined the square "1,1"
-And the non taged mine counter is "9"
-When the user untags the square "1,1"
-Then the square "1,1" should appear as covered square
-And there is no simbol in the square "1,1"
-And the non tagged mine counter should be "10"
 
 
 Scenario: Tagging a square: -> When the user tags as mined more squares than the non taged mine counter  
@@ -91,7 +83,7 @@ Given the following mockdata is loaded: "oxo-oxo-ooo"
 When the user tags the square "1,1","1,3","2,1"
 Then the non tagged mine counter should be "-1"
 
-@actual
+
 Scenario Outline: Uncover a square: -> Uncover an empty square with one or more adjacent mines
 Given the following mockdata is loaded: "<mockdata>"
 When the user uncover the square "2,2"
@@ -108,11 +100,11 @@ Examples:
 |   xxx-xox-xxo       |   7        |
 |   xxx-xox-xxx       |   8        |
 
-Scenario: Win the game when the user reveal all the squares that no contains a mine
-Given the following mockdata is loaded: "ox"
-When the user uncover the square "1,1"
-Then the user wins
 
+Scenario: Win the game when the user reveal all the squares that no contains a mine
+Given the following mockdata is loaded: "oxo"
+When the user uncover the square "1,1" and the square "1,3"
+Then the user wins
 
 Scenario: Game is Over
 Given the following mockdata is loaded: "oxo-oox-xox"
@@ -142,16 +134,17 @@ And the user tagged as inconclusive the square "1,2"
 And the time counter reaches "10"
 Then the time counter should be "∞" 
 
+@manual
 Scenario: Time counter: -> When the user wins the game the time counter stops
 Given Given the following mockdata is loaded: "ox"
 When the user uncovered the square "1,1"
 Then the time counter shoud stop
-
+@manual
 Scenario: Time counter: -> When the user lose the game the time counter stops
 Given the following mockdata is loaded: "oxo-oox-xox"
 When the user uncover the square "1,2"
 Then the time counter shoud stop
-
+@manual
 Scenario: The user use the reset button to reset the game
 When the user use the reset button
 Then the game should restore to the default state
@@ -168,24 +161,9 @@ When the user uncover the square "2,2"
 Then the display of the table should be:
 """
 000
-000
+000 
 232
 ...
-"""
-
-Scenario: Uncover a square: -> When the square is uncovered by another square and that square is empty then it should uncover the adjacent squares 
-Given the following mockdata is loaded:
-"""
-oox
-ooo
-ooo
-"""
-And the square "1,1" is uncovered 
-Then the display of the table should be:
-"""
-01.
-011
-000
 """
 
 

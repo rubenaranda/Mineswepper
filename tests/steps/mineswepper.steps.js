@@ -11,10 +11,55 @@ async function cellDiscover(string) {
 	await page.click(`[data-testid="${string}"]`, { force: true });
 }
 
+
+async function mockDataTransformer(docString) {
+  let string = ""
+  for (let i = 0; i < docString.length; i++) {
+   string += docString[i].replace("\n","-")
+  }
+  return string
+}
+
+async function boardToString (docString) {
+  let string = ""
+  var height = ((await docString).match(/-/g) || []).length + 1
+  var width = (await docString).indexOf("-") 
+  for (let i = 1; i < height+1; i++) {
+    for (let j = 1; j < width+1; j++) {
+    let displayText = await page.locator('data-testid='+i+","+j).innerText();
+    let displayClass = await page.locator('data-testid='+i+","+j).getAttribute("class");
+    if (displayText == "" && displayClass.includes("sqUncovered")) {
+      string+="0"
+    } else if (displayText == "") {
+      string +="."
+    } else {
+      string += displayText
+    }
+    }
+    string+= "-"
+  }
+  string.slice(0,-1)
+  return string
+}
+
+async function checkBoard (board,string) {
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] != string[i]) {
+      return "failed"
+    }
+  }
+  return "passed"
+}
+
 //Background scenario
 Given("a user opens the game",async function() {
     await page.goto(url);
 })
+
+Given('the following mockdata is loaded:',async function (docString) {
+  let mockData = await mockDataTransformer(docString);
+  await page.goto(url + '?mockData=' + mockData);
+});
 
 // To load mockData tests
 Given('the following mockdata is loaded: {string}', async function (mockData) {
@@ -29,12 +74,12 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
   // To check if the cell is uncoverd
   Then('the square {string} should be uncovered',async function (string) {
     const display = await page.locator('data-testid='+string).innerText();
-    expect(display).toBe("")
+    expect(display).toBe("1")
   });
 
   Then('the square {string} should be disabled',async function (string) {
-    const display = await page.locator('data-testid='+string).getAttribute("disabled");
-    expect(display).toBe("disabled")
+    const display = await page.locator('data-testid='+string).getAttribute("onclick");
+    expect(display).toBe(null)
   });
 
   Then('the square {string} should show an explosion simbol',async function (string) {
@@ -58,15 +103,15 @@ Given('the following mockdata is loaded: {string}', async function (mockData) {
     for (let x = 1; x < 4; x++) {
       for (let y = 1; y < 4; y++) {
         const cellId = x + "," + y
-        const cellStatus = await page.locator(`[data-testid="${cellId}"]`).getAttribute("disabled");
-        expect(cellStatus).toBe("true");
+        const cellStatus = await page.locator(`[data-testid="${cellId}"]`).getAttribute("onclick");
+        expect(cellStatus).toBe(null);
       }
     }
   });
 
-  Given('non tagged mine counter is {string}',async function (string) {
-   let display = await page.locator("data-testid=mines").innerText();
-    expect(display).toBe(string);
+Given('non tagged mine counter is {string}',async function (string) {
+  let display = await page.locator("data-testid=mines").innerText();
+  expect(display).toBe(string);
 });
 
 When('the user taggs as mined the square {string}',async function (string) {
@@ -124,6 +169,27 @@ When('the user tags the square {string},{string},{string}',async function (strin
   await cellTag(string)
   await cellTag(string2)
   await cellTag(string3)
+});
+
+Then('in the square {string} should contains this number of adjacent mines: {string}',async function (string, string2) {
+  let display = await page.locator(`[data-testid="${string}"]`).innerText();
+  expect(display).toBe(string2)
+});
+
+When('the user uncover the square {string} and the square {string}',async function (string, string2) {
+  await page.click(`[data-testid="${string}"]`, { force: true });
+  await page.click(`[data-testid="${string2}"]`, { force: true });
+});
+
+Then('the user wins',async function () {
+  let display = await page.locator(`[data-testid="sqTable"]`).getAttribute("win")
+  expect(display).toBe("true")
+});
+
+Then('the display of the table should be:',async function (docString) {
+  let string = mockDataTransformer(docString)
+  let board = await boardToString (string)
+  await checkBoard (board,string);
 });
 
 
